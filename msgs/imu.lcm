@@ -1,0 +1,9 @@
+package msgs;
+
+struct imu 
+{
+    double timestamp_valid;
+    double accel[3];
+    double gyro[3];
+    double covariance[6][6];
+}

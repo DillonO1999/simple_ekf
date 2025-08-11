@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/myApp.dir/myProject.cpp.o -o myApp  /usr/lib/x86_64-linux-gnu/liblcm.so.1.5.0 libhelper_lib.a 
