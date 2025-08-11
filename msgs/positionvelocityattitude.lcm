@@ -1,0 +1,11 @@
+package msgs;
+
+struct positionvelocityattitude 
+{
+    int8_t icd_positionvelocityattitude;
+    header header;
+    geodeticposition3d_type position;
+    double velocity[3];
+    double attitude[3];
+    double covariance[9][9];
+}

@@ -1,0 +1,9 @@
+package msgs;
+
+struct altitude 
+{
+    int8_t icd_altitude;
+    header header;
+    double altitude;
+    double variance;
+}

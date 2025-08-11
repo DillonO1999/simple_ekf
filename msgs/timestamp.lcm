@@ -1,0 +1,7 @@
+package msgs;
+
+struct timestamp
+{
+    int64_t sec;
+    int32_t nsec;
+}

@@ -1,0 +1,9 @@
+package msgs;
+
+struct geodeticposition3d 
+{
+    int8_t icd_geodeticposition3d;
+    header header;
+    geodeticposition3d_type position;
+    double covariance[3][3];
+}

@@ -2,8 +2,8 @@ package msgs;
 
 struct imu 
 {
-    double timestamp_valid;
-    double accel[3];
-    double gyro[3];
-    double covariance[6][6];
+    int8_t icd_imu;
+    header header;
+    double delta_v[3];
+    double delta_theta[3];
 }

@@ -1,0 +1,10 @@
+package msgs;
+
+struct header
+{   
+    int64_t seq_num;
+    timestamp timestamp_arrival;
+    timestamp timestamp_valid;
+    string device_id;
+}
+
