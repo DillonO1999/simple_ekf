@@ -28,7 +28,7 @@ void propagate(Matrix<double,3,1>& position, Matrix<double,3,1>& velocity, Matri
     Matrix<double,3,1> Cor; Cor << cos(position(0)), 0, -sin(position(0));
     Matrix<double,3,1> Vels; Vels << velocity(1)/(R_lam+position(2)), -velocity(0)/(R_phi+position(2)), -velocity(1)*tan(position(0))/(R_lam+position(2));
 
-    MatrixXd pos_dot(3,1), vel_dot(3,1);
+    Matrix<double,3,1> pos_dot, vel_dot;
     pos_dot << phi_dot, lam_dot, h_dot;
     vel_dot = accel - skew(2*omega*Cor + Vels)*velocity + gravity;
 

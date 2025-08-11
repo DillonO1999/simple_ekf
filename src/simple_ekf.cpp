@@ -111,7 +111,7 @@ class ekf
             if (pva_timestamp_valid) {
                 if (imu_buffer.size() > 1) {
                     this->imu_timestamp_valid = imu_buffer.back().header.timestamp_valid.sec + (imu_buffer.back().header.timestamp_valid.nsec)*1e-9;
-                    this->imu_dt = (imu_buffer.back().header.timestamp_valid.sec + (imu_buffer.back().header.timestamp_valid.nsec)*1e-9) - (imu_buffer.front().header.timestamp_valid.sec + (imu_buffer.front().header.timestamp_valid.nsec)*1e-9);
+                    this->imu_dt = (imu_buffer.back().header.timestamp_valid.sec + (imu_buffer.back().header.timestamp_valid.nsec)*1e-9) - (imu_buffer[imu_buffer.size()-2].header.timestamp_valid.sec + (imu_buffer[imu_buffer.size()-2].header.timestamp_valid.nsec)*1e-9);
                     for (int i = 0; i < 3; i++) {
                         this->accel(i) = (imu_buffer.front().delta_v[i])/imu_dt;
                         this->gyro(i) = (imu_buffer.front().delta_theta[i])/imu_dt;
@@ -128,10 +128,11 @@ class ekf
                     Matrix<double,3,1> Vels; Vels << velocity(1)/(R_lam+position(2)), -velocity(0)/(R_phi+position(2)), -velocity(1)*tan(position(0))/(R_lam+position(2));
 
                     Matrix<double,3,3> A = q2rot(q);
-                    Matrix<double,3,1> a_bar = A.transpose()*(accel - accel_bias);
+                    Matrix<double,3,1> a_bar_body = accel - accel_bias;
+                    Matrix<double,3,1> a_bar = A.transpose()*a_bar_body;
                     Matrix<double,3,1> g_bar =  (gyro - gyro_bias) - A*(omega*Cor + Vels);
 
-                    Matrix<double,15,15> F = generate_F(position(0), position(2), velocity(0), velocity(1), velocity(2), a_bar, g_bar, attitude(2), A, accel_tau, gyro_tau, omega);
+                    Matrix<double,15,15> F = generate_F(position(0), position(2), velocity(0), velocity(1), velocity(2), a_bar_body, g_bar, attitude(2), A, accel_tau, gyro_tau, omega);
                     Matrix<double,15,12> G = generate_G(A);
                     Matrix<double,12,12> Q = generate_Q(accel_sigma, gyro_sigma, accel_bias_steady_state_sigma, gyro_bias_steady_state_sigma, accel_tau, gyro_tau, A);
                     
