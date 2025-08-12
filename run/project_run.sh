@@ -22,7 +22,7 @@ echo "Running simple_ekf..."
 echo "----------------------------------------"
 echo ""
 
-java -cp /usr/local/share/java/lcm.jar lcm.lcm.TCPService 7700 &>/dev/null & 
+java -cp /usr/share/java/lcm.jar lcm.lcm.TCPService 7700 &>/dev/null & 
 sleep 0.5
 
 lcm-logger -f -q --lcm-url="tcpq://localhost:7700" flightData/output_log.lcmlog 2>/dev/null &

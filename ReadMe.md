@@ -13,7 +13,7 @@ yaml-cpp
 
 #### For plotting
 
-You will need python and the folling packages:
+You will need python and the following packages:
 
 - numpy 
 - matplotlib
