@@ -28,8 +28,6 @@ class ekf
             gps_channel = config["gps_chan"].as<string>();
             imu_channel = config["imu_chan"].as<string>();
 
-            cout << imu_channel << endl;
-
             YAML::Node imu2platform_vec = config["imu2platform"];
             YAML::Node accel_sigma_vec = config["accel_sigma"];
             YAML::Node gyro_sigma_vec = config["gyro_sigma"];

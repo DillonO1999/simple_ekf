@@ -201,7 +201,7 @@ def main():
             # print(f"Temp:  {temperature_c:7.2f} C")
             # print("-" * 40)
             
-            time.sleep(0.5)
+            # time.sleep(0.005)
 
     except KeyboardInterrupt:
         print("Script terminated by user.")
