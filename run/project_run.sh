@@ -54,6 +54,10 @@ else
 
     build/src/simple_ekf 2>/dev/null &
 
+    echo ""
+    echo "............Running mekf............"
+    echo ""
+
     lcm-logplayer-gui -p -l tcpq://localhost:7700 $1 &>/dev/null
 
     wait
