@@ -2,10 +2,6 @@
 # This script reads accelerometer, gyroscope, magnetometer, and temperature data
 # from an MPU9250 sensor via the I2C bus.
 
-# IMPORTANT: Before running, you must enable I2C on your Raspberry Pi.
-# You can do this using `sudo raspi-config` -> Interface Options -> I2C.
-# You may also need to install the smbus2 library: `pip install smbus2`
-
 import smbus2
 import time
 import struct
@@ -13,12 +9,14 @@ import os
 import sys
 import lcm
 import time
+import numpy as np
 
 # Get the current working directory (CWD)
 current_path = os.getcwd() 
 sys.path.insert(0, current_path + "/build/msgs")
 
 from msgs import imu
+from msgs import positionvelocityattitude
 
 # The Raspberry Pi 5 has one I2C bus, usually bus 1.
 I2C_BUS = 1
@@ -149,6 +147,9 @@ def main():
     # print("-" * 40)
 
     lc = lcm.LCM("tcpq://localhost:7700")
+    
+    print("\n............Running mekf............\n")
+
 
     try:
         while True:
@@ -177,22 +178,46 @@ def main():
             temp_raw = read_raw_data(MPU9250_ADDRESS, MPU_TEMP_OUT_H)
             temperature_c = (temp_raw / 333.87) + 21.0
 
+            # Get the current Unix timestamp in nanoseconds
+            nanosecond_timestamp = time.time_ns()
             # Get the current Unix timestamp
-            timestamp = time.time()
-            parts = str(accel_x).split('.')
+            timestamp = nanosecond_timestamp*1e-9
+            parts = str(timestamp).split('.')
             decimal_part_str = parts[1]
 
-            msg = imu()
-            msg.header.timestamp_valid.sec = int(timestamp)
-            msg.header.timestamp_valid.nsec = int(decimal_part_str[:9])
-            msg.delta_v[0] = accel_x
-            msg.delta_v[1] = accel_y
-            msg.delta_v[2] = accel_z
-            msg.delta_theta[0] = gyro_x
-            msg.delta_theta[1] = gyro_y
-            msg.delta_theta[2] = gyro_z
+            # print(f"{timestamp:.9f}")
 
-            lc.publish("aspn/vectorNav/rawimu", msg.encode())
+            msg_pva = positionvelocityattitude()
+            msg_pva.header.timestamp_valid.sec = int(timestamp)
+            msg_pva.header.timestamp_valid.nsec = int(decimal_part_str[:9])
+            msg_pva.position.latitude = 30.41749*(np.pi/180)
+            msg_pva.position.longitude = -86.65958*(np.pi/180)
+            msg_pva.position.altitude = 1
+            msg_pva.velocity = [0, 0, 0]
+            msg_pva.attitude = [0, 0, 0]
+            msg_pva.covariance = [[5**2, 0, 0, 0, 0, 0, 0, 0, 0], 
+                                  [0, 5**2, 0, 0, 0, 0, 0, 0, 0], 
+                                  [0, 0, 8**2, 0, 0, 0, 0, 0, 0], 
+                                  [0, 0, 0, 1**2, 0, 0, 0, 0, 0], 
+                                  [0, 0, 0, 0, 1**2, 0, 0, 0, 0],
+                                  [0, 0, 0, 0, 0, 1.2**2, 0, 0, 0],
+                                  [0, 0, 0, 0, 0, 0, .1**2, 0, 0],
+                                  [0, 0, 0, 0, 0, 0, 0, .1**2, 0],
+                                  [0, 0, 0, 0, 0, 0, 0, 0, .1**2]]
+
+
+            msg_imu = imu()
+            msg_imu.header.timestamp_valid.sec = int(timestamp)
+            msg_imu.header.timestamp_valid.nsec = int(decimal_part_str[:9])
+            msg_imu.delta_v[0] = accel_x
+            msg_imu.delta_v[1] = accel_y
+            msg_imu.delta_v[2] = accel_z
+            msg_imu.delta_theta[0] = gyro_x
+            msg_imu.delta_theta[1] = gyro_y
+            msg_imu.delta_theta[2] = gyro_z
+
+            lc.publish("aspn/vectorNav/rawimu", msg_imu.encode())
+            lc.publish("aspn/vectorNav/positionvelocityattitude", msg_pva.encode())
 
             
             # print(f"Accel: X={accel_x:7.2f} g, Y={accel_y:7.2f} g, Z={accel_z:7.2f} g")

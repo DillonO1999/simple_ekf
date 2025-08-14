@@ -9,18 +9,34 @@ cleanup() {
 }
 trap cleanup SIGINT
 
+# Define the name of the virtual environment directory
+VENV_NAME=".venv"
+
+# Check if the virtual environment directory exists
+if [ -d "$VENV_NAME" ]; then
+    echo "Virtual environment already exists."
+else
+    echo "Creating virtual environment..."
+    python3 -m venv "$VENV_NAME" --prompt="mekf"
+fi
+
+# Activate the virtual environment
+echo "Activating virtual environment..."
+source "$VENV_NAME/bin/activate"
+
+# Run the Python script to check and install dependencies
+echo "Checking and installing dependencies..."
+python3 setup_dependencies.py
+
+echo "Setup complete. Virtual environment is active."
+
+
 mkdir -p build && cd build
 
 cmake .. 2>/dev/null
 cmake --build . 2>/dev/null
 
 cd ..
-
-echo ""
-echo ""
-echo "Running simple_ekf..."
-echo "----------------------------------------"
-echo ""
 
 java -cp /usr/local/share/java/lcm.jar lcm.lcm.TCPService 7700 &>/dev/null & 
 sleep 0.5
